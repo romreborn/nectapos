@@ -3,9 +3,10 @@ import { NextResponse } from 'next/server'
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const supabase = createClient()
         const body = await request.json()
 
@@ -47,7 +48,7 @@ export async function PUT(
                 email: body.email || null,
                 phone: body.phone || null
             })
-            .eq('id', params.id)
+            .eq('id', id)
             .eq('shop_id', profile.shop_id) // Ensure user can only update their shop's customers
             .select()
             .single()
@@ -73,9 +74,10 @@ export async function PUT(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const supabase = createClient()
 
         // Get the auth token from the request header
@@ -112,7 +114,7 @@ export async function DELETE(
         const { error } = await supabase
             .from('customers')
             .delete()
-            .eq('id', params.id)
+            .eq('id', id)
             .eq('shop_id', profile.shop_id) // Ensure user can only delete their shop's customers
 
         if (error) {
