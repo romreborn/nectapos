@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(dir:*)",
+      "Bash(npm run dev)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "Bash(timeout:*)",
+      "Bash(tasklist:*)",
+      "Bash(python:*)",
+      "Bash(powershell:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npx supabase db push:*)",
+      "Bash(cat:*)",
+      "Bash(npx supabase db dump:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
