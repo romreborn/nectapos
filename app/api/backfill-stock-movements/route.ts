@@ -26,7 +26,7 @@ export async function POST() {
             movementsCreated: 0
         }
 
-        for (const transaction of transactions || []) {
+        for (const transaction of (transactions || []) as any[]) {
             try {
                 results.processed++
 
