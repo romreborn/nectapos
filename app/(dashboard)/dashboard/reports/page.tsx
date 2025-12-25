@@ -87,6 +87,7 @@ export default function ReportsPage() {
         if (!shopId) return
 
         async function fetchTableData() {
+            if (!shopId) return
             setLoadingTable(true)
             try {
                 // Dates
