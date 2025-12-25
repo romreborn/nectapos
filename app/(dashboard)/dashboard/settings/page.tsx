@@ -42,8 +42,8 @@ export default function SettingsPage() {
         if (!profile?.shop_id) return
 
         try {
-            const { data, error } = await supabase
-                .from('shops')
+            const { data, error } = await (supabase
+                .from('shops') as any)
                 .select('*')
                 .eq('id', profile.shop_id)
                 .single()
@@ -71,15 +71,15 @@ export default function SettingsPage() {
 
         setLoading(true)
         try {
-            const { error } = await supabase
-                .from('shops')
+            const { error } = await (supabase
+                .from('shops') as any)
                 .update({
                     name: shopName,
                     address: address,
                     phone: phone,
                     currency: currency,
                     tax_percentage: parseFloat(taxPercentage)
-                } as any)
+                })
                 .eq('id', profile.shop_id)
 
             if (error) throw error
