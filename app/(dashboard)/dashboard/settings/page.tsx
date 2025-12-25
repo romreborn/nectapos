@@ -51,11 +51,12 @@ export default function SettingsPage() {
             if (error) throw error
 
             if (data) {
-                setShopName(data.name || '')
-                setAddress(data.address || '')
-                setPhone(data.phone || '')
-                setCurrency(data.currency || 'USD')
-                setTaxPercentage(data.tax_percentage?.toString() || '0')
+                const shopData = data as any
+                setShopName(shopData.name || '')
+                setAddress(shopData.address || '')
+                setPhone(shopData.phone || '')
+                setCurrency(shopData.currency || 'USD')
+                setTaxPercentage(shopData.tax_percentage?.toString() || '0')
             }
         } catch (error) {
             console.error('Error loading settings:', error)
@@ -78,7 +79,7 @@ export default function SettingsPage() {
                     phone: phone,
                     currency: currency,
                     tax_percentage: parseFloat(taxPercentage)
-                })
+                } as any)
                 .eq('id', profile.shop_id)
 
             if (error) throw error
