@@ -40,7 +40,6 @@ export default function SignupPage() {
                     .from('profiles')
                     .insert({
                         id: data.user.id,
-                        email: email,
                         role: 'cashier',
                         shop_id: '550e8400-e29b-41d4-a716-446655440000' // Demo shop
                     })
