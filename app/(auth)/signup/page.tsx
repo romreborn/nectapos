@@ -42,7 +42,7 @@ export default function SignupPage() {
                         id: data.user.id,
                         role: 'cashier',
                         shop_id: '550e8400-e29b-41d4-a716-446655440000' // Demo shop
-                    })
+                    } as any)
 
                 if (profileError) {
                     console.error('Profile creation error:', profileError)
