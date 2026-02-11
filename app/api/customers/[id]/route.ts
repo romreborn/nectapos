@@ -26,8 +26,8 @@ export async function PUT(
         }
 
         // Get user's shop ID from profiles table
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
+        const { data: profile, error: profileError } = await (supabase
+            .from('profiles') as any)
             .select('shop_id')
             .eq('id', user.id)
             .single()
@@ -41,8 +41,8 @@ export async function PUT(
         }
 
         // Update customer
-        const { data: customer, error } = await supabase
-            .from('customers')
+        const { data: customer, error } = await (supabase
+            .from('customers') as any)
             .update({
                 name: body.name,
                 email: body.email || null,
@@ -96,8 +96,8 @@ export async function DELETE(
         }
 
         // Get user's shop ID from profiles table
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
+        const { data: profile, error: profileError } = await (supabase
+            .from('profiles') as any)
             .select('shop_id')
             .eq('id', user.id)
             .single()
@@ -111,8 +111,8 @@ export async function DELETE(
         }
 
         // Delete customer
-        const { error } = await supabase
-            .from('customers')
+        const { error } = await (supabase
+            .from('customers') as any)
             .delete()
             .eq('id', id)
             .eq('shop_id', profile.shop_id) // Ensure user can only delete their shop's customers

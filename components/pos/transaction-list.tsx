@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { format } from 'date-fns'
 import { createClient } from '@/lib/supabase/client'
 import { useShopSettings, formatCurrency } from '@/lib/hooks/use-shop-settings'
 
@@ -31,8 +30,12 @@ interface Transaction {
     id: string
     created_at: string
     total_amount: number
+    subtotal_amount?: number
+    tax_amount?: number
+    payment_method?: string
     status: string
     user_id?: string
+    customer_id?: string
     customers?: {
         name?: string
         email?: string
@@ -40,6 +43,10 @@ interface Transaction {
     }
     items?: any[]
 }
+
+import { Skeleton } from '@/components/ui/skeleton'
+
+// ... (existing helper functions)
 
 export function TransactionList({
     shopId,
@@ -67,7 +74,6 @@ export function TransactionList({
             setLoading(true)
             setError(null)
 
-            // Get current session
             const { data: { session } } = await supabase.auth.getSession()
 
             if (!session?.user) {
@@ -75,24 +81,10 @@ export function TransactionList({
                 return
             }
 
-            console.log('TransactionList - Session user:', {
-                id: session.user.id,
-                email: session.user.email,
-                aud: session.user.aud
-            })
-            console.log('TransactionList - Fetching for user:', session.user.id)
-            console.log('Date range:', { startDate, endDate })
-            console.log('Shop ID:', shopId)
-
-            // Use the transactions API instead of direct Supabase
             const url = new URL('/api/transactions-pos', window.location.origin)
             url.searchParams.set('shopId', shopId)
-            if (startDate) {
-                url.searchParams.set('startDate', startDate)
-            }
-            if (endDate) {
-                url.searchParams.set('endDate', endDate)
-            }
+            if (startDate) url.searchParams.set('startDate', startDate)
+            if (endDate) url.searchParams.set('endDate', endDate)
 
             const response = await fetch(url.toString(), {
                 headers: {
@@ -100,31 +92,14 @@ export function TransactionList({
                 }
             })
 
-            if (!response.ok) {
-                const errorData = await response.json()
-                console.error('Fetch error:', errorData)
-                setError(errorData.error || 'Failed to fetch transactions')
+            const responseData = await response.json()
+
+            if (!response.ok || !responseData.success) {
+                setError(responseData.error || 'Failed to fetch transactions')
                 return
             }
 
-            const data = await response.json()
-            console.log('TransactionList - API Response:', {
-                count: data.transactions?.length || 0,
-                stats: data.stats
-            })
-
-            // Log each transaction's user_id for debugging
-            if (data.transactions && data.transactions.length > 0) {
-                console.log('TransactionList - Transaction user_ids:',
-                    data.transactions.map(t => ({
-                        id: t.id,
-                        user_id: t.user_id,
-                        created_at: t.created_at
-                    }))
-                )
-            }
-
-            setTransactions(data.transactions || [])
+            setTransactions(responseData.data?.transactions || [])
         } catch (err) {
             console.error('TransactionList error:', err)
             setError('Failed to load transactions')
@@ -135,8 +110,22 @@ export function TransactionList({
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <p className="text-muted-foreground">Loading transactions...</p>
+            <div className="space-y-3 p-4">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="rounded-xl border bg-card text-card-foreground shadow p-4 space-y-3">
+                        <div className="flex justify-between items-start">
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-3 w-16" />
+                            </div>
+                            <Skeleton className="h-5 w-16 rounded-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-2/3" />
+                        </div>
+                    </div>
+                ))}
             </div>
         )
     }
@@ -145,7 +134,6 @@ export function TransactionList({
         return (
             <div className="flex flex-col items-center justify-center h-64 text-red-500">
                 <p>Error: {error}</p>
-                <p className="text-sm mt-2">User ID: {currentUserId.slice(0, 8)}...</p>
             </div>
         )
     }
@@ -155,9 +143,6 @@ export function TransactionList({
             <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
                 <p className="text-lg font-medium">No transactions yet</p>
                 <p className="text-sm">Your completed sales will appear here</p>
-                <p className="text-xs mt-2">
-                    Showing transactions for user: {currentUserId.slice(0, 8)}...
-                </p>
             </div>
         )
     }
@@ -167,9 +152,6 @@ export function TransactionList({
             <div className="space-y-3 p-4">
                 {transactions.map((transaction) => {
                     const items = transaction.items || []
-
-                    // Debug log to see the actual items structure
-                    console.log('Items:', items)
 
                     return (
                         <Card key={transaction.id} className="p-4">
@@ -181,13 +163,10 @@ export function TransactionList({
                                     <p className="text-xs text-muted-foreground">
                                         ID: {transaction.id.slice(0, 8)}...
                                     </p>
-                                    {transaction.user_id && (
-                                        <p className="text-xs text-muted-foreground">
-                                            Created by: {transaction.user_id.slice(0, 8)}...
-                                            {currentUserId === transaction.user_id && (
-                                                <span className="text-green-600 ml-1"> (You)</span>
-                                            )}
-                                        </p>
+                                    {transaction.payment_method && (
+                                        <Badge variant="outline" className="mt-1 text-xs">
+                                            {transaction.payment_method}
+                                        </Badge>
                                     )}
                                 </div>
                                 <Badge variant={transaction.status === 'completed' ? 'default' : 'secondary'}>
@@ -199,17 +178,11 @@ export function TransactionList({
                             {items && items.length > 0 ? (
                                 <div className="space-y-2 mb-3">
                                     {items.slice(0, 3).map((item: any, idx: number) => {
-                                        // Handle different possible field names
-                                        const quantity = Number(item.quantity || item.qty || item.quantity_at_sale || 1)
-                                        const price = Number(item.price_at_sale || item.price || item.unit_price || 0)
-                                        const name = item.product_name || item.name || item.product || 'Unknown Product'
-                                        const totalPrice = quantity * price
-
-                                        // Check if tax info is available (new format)
-                                        const hasTax = item.tax_amount !== undefined && item.tax_percentage !== undefined
-                                        const subtotal = Number(item.subtotal || totalPrice)
-                                        const taxAmount = hasTax ? Number(item.tax_amount) : 0
-                                        const itemTotal = hasTax ? Number(item.total) : totalPrice
+                                        const quantity = Number(item.quantity || item.qty || 1)
+                                        // Handle both old and new price fields
+                                        const price = Number(item.price || item.price_at_sale || 0)
+                                        const name = item.product_name || item.name || 'Unknown Product'
+                                        const subtotal = Number(item.subtotal || (price * quantity))
 
                                         return (
                                             <div key={idx} className="text-sm">
@@ -217,14 +190,8 @@ export function TransactionList({
                                                     <span className="text-muted-foreground">
                                                         {quantity}x {name}
                                                     </span>
-                                                    <span>{formatCurrency(itemTotal, settings.currency)}</span>
+                                                    <span>{formatCurrency(subtotal, settings.currency)}</span>
                                                 </div>
-                                                {hasTax && taxAmount > 0 && (
-                                                    <div className="ml-8 text-xs text-muted-foreground">
-                                                        Subtotal: {formatCurrency(subtotal, settings.currency)} |
-                                                        Tax ({item.tax_percentage}%): {formatCurrency(taxAmount, settings.currency)}
-                                                    </div>
-                                                )}
                                             </div>
                                         )
                                     })}
@@ -241,16 +208,28 @@ export function TransactionList({
                             )}
 
                             {/* Transaction Summary */}
-                            <div className="space-y-1 pt-2 border-t">
-                                <div className="flex justify-between font-bold">
+                            <div className="space-y-1 pt-2 border-t text-sm">
+                                {transaction.subtotal_amount !== undefined && transaction.subtotal_amount !== transaction.total_amount && (
+                                    <div className="flex justify-between text-muted-foreground">
+                                        <span>Subtotal</span>
+                                        <span>{formatCurrency(Number(transaction.subtotal_amount), settings.currency)}</span>
+                                    </div>
+                                )}
+                                {transaction.tax_amount !== undefined && transaction.tax_amount > 0 && (
+                                    <div className="flex justify-between text-muted-foreground">
+                                        <span>Tax</span>
+                                        <span>{formatCurrency(Number(transaction.tax_amount), settings.currency)}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between font-bold text-base mt-1">
                                     <span>Total</span>
                                     <span>{formatCurrency(Number(transaction.total_amount || 0), settings.currency)}</span>
                                 </div>
                             </div>
 
-                            {transaction.customer_id && (
+                            {(transaction.customer_id || transaction.customers?.name) && (
                                 <p className="text-xs text-muted-foreground mt-2">
-                                    Customer: Anonymous Guest
+                                    Customer: {transaction.customers?.name || 'Guest'}
                                 </p>
                             )}
                         </Card>

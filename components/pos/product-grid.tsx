@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { useProducts } from "@/lib/hooks/use-products"
 import { useShopSettings, formatCurrency } from "@/lib/hooks/use-shop-settings"
 import { useCartStore } from "@/lib/pos/cart-store"
@@ -12,8 +13,11 @@ import { Database } from "@/types/supabase"
 
 type Product = Database['public']['Tables']['products']['Row']
 
+const ITEMS_PER_PAGE = 5
+
 export function ProductGrid() {
     const [searchTerm, setSearchTerm] = useState("")
+    const [currentPage, setCurrentPage] = useState(1)
     const { profile } = useUserProfile()
     const { products, loading } = useProducts(profile?.shop_id || undefined)
     const { settings } = useShopSettings()
@@ -23,6 +27,26 @@ export function ProductGrid() {
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (product.sku?.toLowerCase() || '').includes(searchTerm.toLowerCase())
     )
+
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE)
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+    const endIndex = startIndex + ITEMS_PER_PAGE
+    const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+
+    // Reset to page 1 when search changes
+    const handleSearchChange = (value: string) => {
+        setSearchTerm(value)
+        setCurrentPage(1)
+    }
+
+    const handlePreviousPage = () => {
+        setCurrentPage((prev) => Math.max(1, prev - 1))
+    }
+
+    const handleNextPage = () => {
+        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+    }
 
     if (loading) {
         return (
@@ -39,24 +63,24 @@ export function ProductGrid() {
                 <Input
                     placeholder="Search products..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     className="pl-10"
                 />
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-auto">
-                {filteredProducts.map((product) => (
+            <div className="grid grid-cols-2 gap-4">
+                {paginatedProducts.map((product) => (
                     <Card
                         key={product.id}
                         className="p-4 cursor-pointer hover:bg-accent transition-colors"
                         onClick={() => addToCart(product)}
                     >
                         <div className="flex flex-col gap-2">
-                            <h3 className="font-semibold truncate">{product.name}</h3>
-                            <p className="text-2xl font-bold">
+                            <h3 className="text-sm font-semibold truncate">{product.name}</h3>
+                            <p className="text-lg font-bold">
                                 {formatCurrency(product.price, settings.currency)}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs text-muted-foreground">
                                 Stock: {product.stock_qty ?? 0}
                             </p>
                         </div>
@@ -67,6 +91,38 @@ export function ProductGrid() {
             {filteredProducts.length === 0 && (
                 <div className="flex items-center justify-center h-64">
                     <p className="text-muted-foreground">No products found</p>
+                </div>
+            )}
+
+            {/* Pagination Controls */}
+            {filteredProducts.length > 0 && (
+                <div className="flex items-center justify-between mt-4">
+                    <p className="text-sm text-muted-foreground">
+                        Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
+                    </p>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handlePreviousPage}
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                            Previous
+                        </Button>
+                        <span className="text-sm">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
             )}
         </div>

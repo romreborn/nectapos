@@ -164,7 +164,7 @@ export default function DashboardPage() {
                 {loadingSummary ? (
                     <Card className="h-32 bg-orange-500/10 border-orange-500/20"><CardContent className="p-6"><Skeleton className="h-8 w-1/2 bg-orange-500/20" /></CardContent></Card>
                 ) : (
-                    <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-orange-500/10 border-orange-500/20 backdrop-blur-sm">
+                    <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-orange-500/20 border-orange-500/20 backdrop-blur-sm">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium text-orange-900 dark:text-orange-100">Daily Sales</CardTitle>
                             <div className="p-2 bg-orange-500/20 rounded-full">
@@ -187,7 +187,7 @@ export default function DashboardPage() {
                 {loadingSummary ? (
                     <Card className="h-32 bg-orange-500/10 border-orange-500/20"><CardContent className="p-6"><Skeleton className="h-8 w-1/2 bg-orange-500/20" /></CardContent></Card>
                 ) : (
-                    <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-orange-500/10 border-orange-500/20 backdrop-blur-sm">
+                    <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-orange-500/20 border-orange-500/20 backdrop-blur-sm">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium text-orange-900 dark:text-orange-100">Weekly Sales</CardTitle>
                             <div className="p-2 bg-orange-500/20 rounded-full">
@@ -210,7 +210,7 @@ export default function DashboardPage() {
                 {loadingSummary ? (
                     <Card className="h-32 bg-orange-500/10 border-orange-500/20"><CardContent className="p-6"><Skeleton className="h-8 w-1/2 bg-orange-500/20" /></CardContent></Card>
                 ) : (
-                    <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-orange-500/10 border-orange-500/20 backdrop-blur-sm">
+                    <Card className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] bg-orange-500/20 border-orange-500/20 backdrop-blur-sm">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium text-orange-900 dark:text-orange-100">Monthly Sales</CardTitle>
                             <div className="p-2 bg-orange-500/20 rounded-full">
@@ -233,7 +233,7 @@ export default function DashboardPage() {
             {/* Charts and Top Items - Darker Background for Contrast */}
             <div className="grid gap-4 lg:grid-cols-7">
                 {/* Weekly Hourly Sales Chart */}
-                <Card className="lg:col-span-4 bg-teal-500/10 backdrop-blur-md border-teal-500/20 shadow-lg">
+                <Card className="lg:col-span-4 bg-teal-500/20 backdrop-blur-md border-teal-500/20 shadow-lg">
                     <CardHeader>
                         <CardTitle className="text-teal-900 dark:text-teal-100">Weekly Sales Activity</CardTitle>
                         <CardDescription className="text-teal-600/80 dark:text-teal-200/70">Sales distribution by hour (UTC+7)</CardDescription>
@@ -287,7 +287,7 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Top Items */}
-                <Card className="lg:col-span-3 bg-teal-500/10 backdrop-blur-md border-teal-500/20 shadow-lg">
+                <Card className="lg:col-span-3 bg-teal-500/20 backdrop-blur-md border-teal-500/20 shadow-lg">
                     <CardHeader>
                         <CardTitle className="text-teal-900 dark:text-teal-100">Top Selling Items</CardTitle>
                         <CardDescription className="text-teal-600/80 dark:text-teal-200/70">Most popular products this month</CardDescription>

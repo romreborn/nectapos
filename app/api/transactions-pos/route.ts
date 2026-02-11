@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/client'
 import { createServiceClient } from '@/lib/supabase/service-client'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { successResponse, errorResponse } from '@/lib/api-response'
 
 export async function GET(request: NextRequest) {
     try {
@@ -233,7 +234,7 @@ export async function GET(request: NextRequest) {
             const serviceResult = await builder
             console.log('Service client - Result count:', serviceResult.data?.length || 0)
 
-            return NextResponse.json({
+            return successResponse({
                 transactions: serviceResult.data || [],
                 stats: {
                     totalSales: (serviceResult.data || []).reduce((sum: number, t: any) => sum + (t.total_amount || 0), 0),
@@ -249,7 +250,7 @@ export async function GET(request: NextRequest) {
 
         if (error) {
             console.error('POS Transaction fetch error:', error)
-            return NextResponse.json({ error: error.message }, { status: 500 })
+            return errorResponse(error.message, 500)
         }
 
         // Calculate stats
@@ -279,15 +280,12 @@ export async function GET(request: NextRequest) {
             avgOrderValue
         }
 
-        return NextResponse.json({
+        return successResponse({
             transactions: transactions || [],
             stats
         })
-    } catch (error) {
+    } catch (error: any) {
         console.error('POS API Error:', error)
-        return NextResponse.json(
-            { error: 'Internal server error' },
-            { status: 500 }
-        )
+        return errorResponse('Internal server error', 500, { error: error.message })
     }
 }

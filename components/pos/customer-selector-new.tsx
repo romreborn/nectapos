@@ -58,7 +58,8 @@ export function CustomerSelectorNew({ customerId, customerName, onCustomerChange
 
                 if (response.ok) {
                     const data = await response.json()
-                    const customers = data.customers || []
+                    // API returns {success: true, data: {customers: [...]}}
+                    const customers = data.data?.customers || data.customers || []
                     if (Array.isArray(customers)) {
                         setCustomers(customers)
                         setIsOpen(customers.length > 0)
@@ -200,9 +201,8 @@ export function CustomerSelectorNew({ customerId, customerName, onCustomerChange
                                 {customers.map((customer, index) => (
                                     <div
                                         key={customer.id}
-                                        className={`px-3 py-2 cursor-pointer hover:bg-accent text-sm flex items-center justify-between ${
-                                            index === selectedIndex ? 'bg-accent' : ''
-                                        }`}
+                                        className={`px-3 py-2 cursor-pointer hover:bg-accent text-sm flex items-center justify-between ${index === selectedIndex ? 'bg-accent' : ''
+                                            }`}
                                         onMouseDown={(e: MouseEvent) => {
                                             e.preventDefault()
                                             handleSuggestionClick(customer)

@@ -45,9 +45,6 @@ export function CustomerSelector({ customerId, customerName, onCustomerChange }:
                     return
                 }
 
-                // Log search term for debugging
-                console.log('Searching for customers with term:', searchTerm.trim())
-
                 // Fetch customers from API
                 const url = new URL('/api/customers', window.location.origin)
                 url.searchParams.set('search', searchTerm.trim())
@@ -60,16 +57,11 @@ export function CustomerSelector({ customerId, customerName, onCustomerChange }:
 
                 if (response.ok) {
                     const data = await response.json()
-                    console.log('Full API response:', data)
-                    console.log('Found customers:', data.customers?.length || 0)
-                    console.log('Customers data:', data.customers)
-
-                    const customers = data.customers || []
+                    // API returns {success: true, data: {customers: [...]}}
+                    const customers = data.data?.customers || data.customers || []
                     if (Array.isArray(customers)) {
                         setCustomers(customers)
-                        console.log('Set customers:', customers)
                     } else {
-                        console.error('Customers is not an array:', customers)
                         setCustomers([])
                     }
                 } else {

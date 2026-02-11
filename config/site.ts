@@ -32,8 +32,13 @@ export const siteConfig = {
             icon: Package
         },
         {
-            title: "Reports",
+            title: "Sales Reports",
             href: "/dashboard/reports",
+            icon: FileBarChart
+        },
+        {
+            title: "Inventory Reports",
+            href: "/dashboard/inventory-reports",
             icon: FileBarChart
         },
         {

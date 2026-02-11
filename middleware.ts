@@ -66,36 +66,15 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // 2. Authenticated users on root path - redirect based on role
-    if (user && path === '/') {
+    // 2. Authenticated users on root path or login page - redirect based on role
+    if (user && (path === '/' || path.startsWith('/login'))) {
         const { data: profile } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', user.id)
             .single()
 
-        const role = profile?.role || 'cashier'
-
-        if (role === 'superadmin') {
-            return NextResponse.redirect(new URL('/admin', request.url))
-        } else if (role === 'cashier') {
-            return NextResponse.redirect(new URL('/dashboard/pos', request.url))
-        } else {
-            // owner, manager
-            return NextResponse.redirect(new URL('/dashboard', request.url))
-        }
-    }
-
-    // 3. Authenticated users trying to access auth routes (like /login)
-    if (user && path.startsWith('/login')) {
-        // Fetch user profile to determine where to redirect
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single()
-
-        const role = profile?.role || 'cashier'
+        const role = (profile as any)?.role || 'cashier'
 
         if (role === 'superadmin') {
             return NextResponse.redirect(new URL('/admin', request.url))

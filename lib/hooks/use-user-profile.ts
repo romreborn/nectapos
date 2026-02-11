@@ -1,46 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { Database } from '@/types/supabase'
+import { useAuth } from '@/components/providers/auth-provider'
 
-type Profile = Database['public']['Tables']['profiles']['Row']
-
+/**
+ * Optimized useUserProfile using central Context
+ * No longer fetches data directly
+ */
 export function useUserProfile() {
-    const [profile, setProfile] = useState<Profile | null>(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<Error | null>(null)
-    const supabase = createClient()
+    const { profile, loading, error, signOut } = useAuth()
 
-    useEffect(() => {
-        fetchProfile()
-    }, [])
-
-    async function fetchProfile() {
-        try {
-            setLoading(true)
-            const { data: { user } } = await supabase.auth.getUser()
-
-            if (!user) {
-                throw new Error('User not authenticated')
-            }
-
-            const { data, error: fetchError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single()
-
-            if (fetchError) throw fetchError
-            setProfile(data)
-            setError(null)
-        } catch (err) {
-            console.error('Error fetching user profile:', err)
-            setError(err as Error)
-        } finally {
-            setLoading(false)
-        }
+    // Maintain same API as before for backward compatibility
+    return {
+        profile,
+        loading,
+        error,
+        refetch: () => Promise.resolve(), // No-op as provider handles updates
+        signOut
     }
-
-    return { profile, loading, error, refetch: fetchProfile }
 }

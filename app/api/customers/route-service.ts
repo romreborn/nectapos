@@ -12,8 +12,8 @@ export async function POST(request: Request) {
         const defaultShopId = '550e8400-e29b-41d4-a716-446655440000'
 
         // Create new customer using service role (bypasses RLS)
-        const { data: customer, error } = await serviceSupabase
-            .from('customers')
+        const { data: customer, error } = await (serviceSupabase
+            .from('customers') as any)
             .insert({
                 name: body.name,
                 email: body.email || null,

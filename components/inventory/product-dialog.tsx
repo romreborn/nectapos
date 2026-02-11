@@ -85,12 +85,15 @@ export function ProductDialog({ product, trigger }: ProductDialogProps) {
                 toast.success("Product updated successfully")
             } else {
                 // Create Mode
-                const docId = uuidv4()
-                const shopId = '550e8400-e29b-41d4-a716-446655440000' // Demo shop ID
+                if (!profile?.shop_id) {
+                    toast.error("Shop ID not found. Please reload.")
+                    return
+                }
 
+                const docId = uuidv4()
                 const { error } = await createProduct({
                     id: docId,
-                    shop_id: shopId,
+                    shop_id: profile.shop_id,
                     name: data.name,
                     sku: data.sku || null,
                     price: Number(data.price),
@@ -128,6 +131,7 @@ export function ProductDialog({ product, trigger }: ProductDialogProps) {
                 </DialogHeader>
                 <Form {...(form as any)}>
                     <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-4">
+
                         <FormField
                             control={form.control as any}
                             name="name"
@@ -205,7 +209,10 @@ export function ProductDialog({ product, trigger }: ProductDialogProps) {
                             )}
                         />
                         <DialogFooter>
-                            <Button type="submit">{product ? "Save Changes" : "Create Product"}</Button>
+                            <Button type="submit" disabled={loading}>
+                                {loading && <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />}
+                                {product ? "Save Changes" : "Create Product"}
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

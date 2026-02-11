@@ -62,11 +62,13 @@ export default function CustomersPage() {
             })
 
             if (!response.ok) {
-                throw new Error('Failed to fetch customers')
+                const errorData = await response.json()
+                throw new Error(errorData.error || 'Failed to fetch customers')
             }
 
             const data = await response.json()
-            setCustomers(data.customers || [])
+            // API returns {success: true, data: {customers: [...]}}
+            setCustomers(data.data?.customers || [])
         } catch (error: any) {
             toast.error(error.message || 'Failed to fetch customers')
         } finally {
