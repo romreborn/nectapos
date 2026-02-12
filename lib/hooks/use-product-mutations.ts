@@ -21,7 +21,7 @@ export function useProductMutations() {
             }
 
             // Use RPC to create product and initial stock movement
-            const { data, error } = await supabase.rpc('create_product_general', {
+            const { data, error } = await (supabase as any).rpc('create_product_general', {
                 p_id: product.id || crypto.randomUUID(),
                 p_shop_id: profile.shop_id, // Force use of profile shop_id
                 p_user_id: profile.id,
@@ -53,7 +53,7 @@ export function useProductMutations() {
             }
 
             // Use RPC to update product and track stock changes
-            const { data, error } = await supabase.rpc('update_product_general', {
+            const { data, error } = await (supabase as any).rpc('update_product_general', {
                 p_product_id: id,
                 p_shop_id: profile.shop_id,
                 p_user_id: profile.id,

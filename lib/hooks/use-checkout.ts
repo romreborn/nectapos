@@ -49,7 +49,7 @@ export function useCheckout() {
             }))
 
             // Call RPC
-            const { data, error } = await supabase.rpc('process_checkout', {
+            const { data, error } = await (supabase as any).rpc('process_checkout', {
                 p_shop_id: shopId,
                 p_user_id: user.id,
                 p_customer_id: options.customerId,
