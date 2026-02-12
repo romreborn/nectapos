@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import { ProductDocType } from '@/lib/database/schema'
 import { Database } from '@/types/supabase'
 
+type Product = Database['public']['Tables']['products']['Row']
+
 export interface CartItem {
-    product: ProductDocType
+    product: Product
     qty: number
     price: number // Snapshot of price at time of add
 }
@@ -12,7 +13,7 @@ interface CartState {
     items: CartItem[]
     customerId: string | null
     customerName: string
-    addToCart: (product: ProductDocType) => void
+    addToCart: (product: Product) => void
     removeFromCart: (productId: string) => void
     updateQty: (productId: string, delta: number) => void
     clearCart: () => void
