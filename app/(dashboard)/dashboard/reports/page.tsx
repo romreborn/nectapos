@@ -79,7 +79,7 @@ export default function ReportsPage() {
                 const start = new Date(dateRange.startDate).toISOString()
                 const end = new Date(new Date(dateRange.endDate).setHours(23, 59, 59, 999)).toISOString()
 
-                const { data, error } = await supabase.rpc('get_sales_analytics', {
+                const { data, error } = await (supabase as any).rpc('get_sales_analytics', {
                     p_shop_id: shopId,
                     p_start_date: start,
                     p_end_date: end
@@ -111,7 +111,7 @@ export default function ReportsPage() {
                 const start = new Date(dateRange.startDate).toISOString()
                 const end = new Date(new Date(dateRange.endDate).setHours(23, 59, 59, 999)).toISOString()
 
-                const { data, error } = await supabase.rpc('search_transactions', {
+                const { data, error } = await (supabase as any).rpc('search_transactions', {
                     p_shop_id: shopId,
                     p_search_term: debouncedSearch,
                     p_start_date: start,
