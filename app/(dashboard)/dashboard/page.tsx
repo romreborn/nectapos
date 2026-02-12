@@ -39,21 +39,21 @@ export default function DashboardPage() {
                 const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).toISOString()
 
                 // Get Daily Summary
-                const { data: dailyData, error: dailyError } = await supabase.rpc(
+                const { data: dailyData, error: dailyError } = await (supabase as any).rpc(
                     'get_dashboard_summary',
                     { p_shop_id: shopId, p_start_date: startOfDay, p_end_date: endOfDay } as any
                 )
 
                 // Get Week Summary for comparison
                 const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1)).toISOString() // Monday
-                const { data: weeklyData } = await supabase.rpc(
+                const { data: weeklyData } = await (supabase as any).rpc(
                     'get_dashboard_summary',
                     { p_shop_id: shopId, p_start_date: startOfWeek, p_end_date: endOfDay } as any
                 )
 
                 // Get Month Summary
                 const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
-                const { data: monthlyData } = await supabase.rpc(
+                const { data: monthlyData } = await (supabase as any).rpc(
                     'get_dashboard_summary',
                     { p_shop_id: shopId, p_start_date: startOfMonth, p_end_date: endOfDay } as any
                 )
@@ -85,7 +85,7 @@ export default function DashboardPage() {
                 const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
                 const today = new Date().toISOString()
 
-                const { data, error } = await supabase.rpc(
+                const { data, error } = await (supabase as any).rpc(
                     'get_sales_chart_data',
                     {
                         p_shop_id: shopId,
@@ -124,7 +124,7 @@ export default function DashboardPage() {
                 const now = new Date()
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-                const { data, error } = await supabase.rpc(
+                const { data, error } = await (supabase as any).rpc(
                     'get_top_products',
                     {
                         p_shop_id: shopId,

@@ -11,7 +11,7 @@ export type Database = {
     // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
     __InternalSupabase: {
         PostgrestVersion: "13.0.5"
-    }
+    },
     public: {
         Tables: {
             customers: {
@@ -51,7 +51,7 @@ export type Database = {
                         referencedColumns: ["id"]
                     },
                 ]
-            }
+            },
             products: {
                 Row: {
                     created_at: string | null
@@ -98,14 +98,14 @@ export type Database = {
                         referencedColumns: ["id"]
                     },
                 ]
-            }
+            },
             profiles: {
                 Row: {
                     created_at: string | null
                     full_name: string | null
                     id: string
                     is_active: boolean | null
-                    role: Database["public"]["Enums"]["user_role"]
+                    role: "superadmin" | "owner" | "manager" | "cashier"
                     shop_id: string | null
                     updated_at: string | null
                 }
@@ -114,7 +114,7 @@ export type Database = {
                     full_name?: string | null
                     id: string
                     is_active?: boolean | null
-                    role?: Database["public"]["Enums"]["user_role"]
+                    role?: "superadmin" | "owner" | "manager" | "cashier"
                     shop_id?: string | null
                     updated_at?: string | null
                 }
@@ -123,7 +123,7 @@ export type Database = {
                     full_name?: string | null
                     id?: string
                     is_active?: boolean | null
-                    role?: Database["public"]["Enums"]["user_role"]
+                    role?: "superadmin" | "owner" | "manager" | "cashier"
                     shop_id?: string | null
                     updated_at?: string | null
                 }
@@ -143,7 +143,7 @@ export type Database = {
                         referencedColumns: ["id"]
                     },
                 ]
-            }
+            },
             shops: {
                 Row: {
                     created_at: string | null
@@ -170,7 +170,7 @@ export type Database = {
                     updated_at?: string | null
                 }
                 Relationships: []
-            }
+            },
             stock_movements: {
                 Row: {
                     created_at: string | null
@@ -226,7 +226,8 @@ export type Database = {
                         referencedRelation: "profiles"
                         referencedColumns: ["id"]
                     },
-                ]
+                ],
+            },
             transactions: {
                 Row: {
                     cancellation_reason: string | null
@@ -236,7 +237,7 @@ export type Database = {
                     id: string
                     items: Json | null
                     shop_id: string
-                    status: Database["public"]["Enums"]["transaction_status"] | null
+                    status: "completed" | "cancelled" | "pending_approval" | null
                     total_amount: number
                     updated_at: string | null
                     user_id: string | null
@@ -249,7 +250,7 @@ export type Database = {
                     id?: string
                     items?: Json | null
                     shop_id: string
-                    status?: Database["public"]["Enums"]["transaction_status"] | null
+                    status?: "completed" | "cancelled" | "pending_approval" | null
                     total_amount?: number
                     updated_at?: string | null
                     user_id?: string | null
@@ -262,7 +263,7 @@ export type Database = {
                     id?: string
                     items?: Json | null
                     shop_id: string
-                    status?: Database["public"]["Enums"]["transaction_status"] | null
+                    status?: "completed" | "cancelled" | "pending_approval" | null
                     total_amount?: number
                     updated_at?: string | null
                     user_id?: string | null
@@ -291,17 +292,17 @@ export type Database = {
                     },
                 ]
             }
-        }
+        },
         Views: {
             [_ in never]: never
-        }
+        },
         Functions: {
             [_ in never]: never
-        }
+        },
         Enums: {
-            transaction_status: "completed" | "cancelled" | "pending_approval"
+            transaction_status: "completed" | "cancelled" | "pending_approval",
             user_role: "superadmin" | "owner" | "manager" | "cashier"
-        }
+        },
         CompositeTypes: {
             [_ in never]: never
         }

@@ -2,13 +2,18 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Database } from '@/types/supabase'
 
-type TransactionInsert = Database['public']['Tables']['transactions']['Insert']
-
-interface TransactionData extends Omit<TransactionInsert, 'id'> {
+interface TransactionData {
     id?: string
+    shop_id: string
+    user_id?: string
+    customer_id?: string | null
+    total_amount: number
+    status?: string
     items?: any[]
+    payment_method?: string
+    tax_amount?: number
+    subtotal_amount?: number
 }
 
 export function useTransactionMutations() {
@@ -22,8 +27,8 @@ export function useTransactionMutations() {
             const transactionId = transaction.id || crypto.randomUUID()
 
             // Insert the transaction with items stored as JSON in the items field
-            const { data: transactionRecord, error: transactionError } = await supabase
-                .from('transactions')
+            const { data: transactionRecord, error: transactionError } = await (supabase
+                .from('transactions') as any)
                 .insert({
                     ...transaction,
                     id: transactionId,
