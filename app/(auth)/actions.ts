@@ -46,13 +46,27 @@ export async function login(formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
-    const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    })
+    // Debug logging for deployment issues
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    console.log('[Login Action] Attempting login for:', email)
+    console.log('[Login Action] Supabase URL exists:', !!supabaseUrl)
+    console.log('[Login Action] Supabase URL prefix:', supabaseUrl?.substring(0, 8))
 
-    if (error) {
-        return { error: error.message }
+    try {
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        })
+
+        if (error) {
+            console.error('[Login Action] Supabase auth error:', error.message)
+            return { error: error.message }
+        }
+
+        console.log('[Login Action] Login successful')
+    } catch (err) {
+        console.error('[Login Action] Unexpected error:', err)
+        return { error: 'Unexpected error during login: ' + (err instanceof Error ? err.message : String(err)) }
     }
 
     revalidatePath('/', 'layout')
