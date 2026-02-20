@@ -58,12 +58,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const { data: { session }, error } = await supabase.auth.getSession()
             if (error || !session) {
                 // Potentially lost session
+                console.log('[Auth] Session check failed or empty', error)
             }
         }, 1000 * 60 * 5) // Check every 5 mins
+
+        // Force session refresh on focus
+        const onFocus = async () => {
+            console.log('[Auth] Window focus - verifying session...')
+            const { data: { session }, error } = await supabase.auth.getSession()
+
+            if (session?.user) {
+                if (session.user.id !== user?.id) {
+                    console.log('[Auth] User changed/recovered on focus')
+                    setUser(session.user)
+                    await fetchProfile(session.user.id)
+                }
+            } else {
+                console.log('[Auth] No session on focus')
+            }
+        }
+        window.addEventListener('focus', onFocus)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') onFocus()
+        })
 
         return () => {
             subscription.unsubscribe()
             clearInterval(interval)
+            window.removeEventListener('focus', onFocus)
+            document.removeEventListener('visibilitychange', onFocus)
         }
     }, [])
 
