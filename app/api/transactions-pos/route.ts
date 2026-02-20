@@ -88,25 +88,19 @@ export async function GET(request: NextRequest) {
 
         if (startDate) {
             // Handle Indonesia timezone (UTC+7)
-            // If user selects date "2025-12-12" in Indonesia, we want to show:
-            // All transactions from 2025-12-12 00:00 WIB to 2025-12-12 23:59 WIB
-            // Since WIB is UTC+7, this is 2025-12-11 17:00 UTC to 2025-12-12 16:59 UTC
+            // We receive a date string YYYY-MM-DD which implies local midnight (00:00 WIB)
+            // 00:00 WIB = Prev Day 17:00 UTC
 
             const startUTC = new Date(startDate + 'T00:00:00.000Z')
-            const startIndonesia = new Date(startUTC.getTime() + 7 * 60 * 60000)
+            // Subtract 7 hours to get UTC equivalent of 00:00 WIB
+            const startIndonesia = new Date(startUTC.getTime() - 7 * 60 * 60000)
 
             let endUTC
             if (endDate) {
-                endUTC = new Date(endDate + 'T23:59:59.999Z')
-                const endIndonesia = new Date(endUTC.getTime() + 7 * 60 * 60000)
-
-                // Convert Indonesia end of day back to UTC
-                endUTC = new Date(Date.UTC(
-                    endIndonesia.getFullYear(),
-                    endIndonesia.getMonth(),
-                    endIndonesia.getDate(),
-                    16, 59, 59, 999 // 23:59 WIB = 16:59 UTC
-                ))
+                // End date 23:59:59 WIB => UTC?
+                // 23:59 WIB = 16:59 UTC
+                const endBase = new Date(endDate + 'T23:59:59.999Z')
+                endUTC = new Date(endBase.getTime() - 7 * 60 * 60000)
             }
 
             console.log('POS API - Indonesia timezone filter:', {
@@ -125,14 +119,8 @@ export async function GET(request: NextRequest) {
             }
         } else if (endDate) {
             // If only endDate is provided
-            const endUTC = new Date(endDate + 'T23:59:59.999Z')
-            const endIndonesia = new Date(endUTC.getTime() + 7 * 60 * 60000)
-            const adjustedEndUTC = new Date(Date.UTC(
-                endIndonesia.getFullYear(),
-                endIndonesia.getMonth(),
-                endIndonesia.getDate(),
-                16, 59, 59, 999
-            ))
+            const endBase = new Date(endDate + 'T23:59:59.999Z')
+            const adjustedEndUTC = new Date(endBase.getTime() - 7 * 60 * 60000)
 
             query = query.lte('created_at', adjustedEndUTC.toISOString())
         }
