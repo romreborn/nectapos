@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Search, Plus, Edit, Trash2, Users } from 'lucide-react'
+import { useAuth } from '@/components/providers/auth-provider'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
@@ -22,6 +23,7 @@ interface Customer {
 }
 
 export default function CustomersPage() {
+    const { user, loading: authLoading } = useAuth()
     const [customers, setCustomers] = useState<Customer[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
@@ -38,14 +40,16 @@ export default function CustomersPage() {
     })
 
     useEffect(() => {
-        fetchCustomers()
-    }, [searchTerm])
+        if (!authLoading && user) {
+            fetchCustomers()
+        }
+    }, [searchTerm, user, authLoading])
 
     const fetchCustomers = async () => {
         try {
             const { data: { session } } = await supabase.auth.getSession()
             if (!session?.user) {
-                toast.error('Not authenticated')
+                // Silent return if no session (handled by auth provider usually)
                 return
             }
 

@@ -26,36 +26,10 @@ export default function LoginPage() {
         }
     }
 
-    // Diagnostic check for env vars
-    const isEnvMissing = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-900 py-12">
 
-            {/* Env Var Misconfiguration Warning */}
-            {isEnvMissing && (
-                <Card className="w-full max-w-sm mb-6 border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-900">
-                    <CardContent className="pt-6">
-                        <div className="flex items-start gap-3">
-                            <span className="text-2xl">⚠️</span>
-                            <div>
-                                <h3 className="font-semibold text-red-900 dark:text-red-200">Configuration Error</h3>
-                                <p className="text-sm text-red-800 dark:text-red-300 mt-1">
-                                    Supabase environment variables are missing in this deployment.
-                                </p>
-                                <div className="mt-3 text-xs font-mono bg-red-100 dark:bg-red-900/20 p-2 rounded">
-                                    <p>URL: {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Set' : '❌ Missing'}</p>
-                                    <p>Key: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing'}</p>
-                                </div>
-                                <p className="text-xs mt-3 text-red-700 dark:text-red-400">
-                                    Please add them to Vercel Project Settings and <strong>Redeploy</strong>.
-                                </p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
 
             <Card className="w-full max-w-sm shadow-xl">
                 <CardHeader className="space-y-1 text-center pb-2">
