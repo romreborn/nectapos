@@ -59,8 +59,20 @@ export function ShopSettingsProvider({ children }: { children: React.ReactNode }
             )
             .subscribe()
 
+        // Revalidate on focus
+        const onFocus = () => {
+            fetchSettings()
+        }
+
+        window.addEventListener('focus', onFocus)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') onFocus()
+        })
+
         return () => {
             supabase.removeChannel(channel)
+            window.removeEventListener('focus', onFocus)
+            document.removeEventListener('visibilitychange', onFocus)
         }
     }, [shopId, authLoading])
 

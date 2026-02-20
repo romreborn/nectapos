@@ -39,8 +39,22 @@ export function useProducts(shopId?: string) {
             )
             .subscribe()
 
+        // Revalidate on focus
+        const onFocus = () => {
+            console.log('[useProducts] Window verified, refreshing data...')
+            fetchProducts()
+        }
+
+        window.addEventListener('focus', onFocus)
+        // Also listen for visibility change (tab switch)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') onFocus()
+        })
+
         return () => {
             supabase.removeChannel(channel)
+            window.removeEventListener('focus', onFocus)
+            document.removeEventListener('visibilitychange', onFocus)
         }
     }, [shopId])
 

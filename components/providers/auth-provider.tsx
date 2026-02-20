@@ -30,22 +30,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Auth state listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (_event, session) => {
+            async (event, session) => {
+                console.log('[Auth] State change:', event)
+
+                if (event === 'TOKEN_REFRESHED') {
+                    console.log('[Auth] Token refreshed successfully')
+                }
+
                 if (session?.user) {
-                    if (session.user.id !== user?.id) {
+                    // Only update if user changed or profile is missing
+                    if (session.user.id !== user?.id || !profile) {
                         setUser(session.user)
                         await fetchProfile(session.user.id)
                     }
-                } else {
+                } else if (event === 'SIGNED_OUT') {
                     setUser(null)
                     setProfile(null)
+                    // Clear any local storage if needed
                 }
+
                 setLoading(false)
             }
         )
 
+        // Periodic session check
+        const interval = setInterval(async () => {
+            const { data: { session }, error } = await supabase.auth.getSession()
+            if (error || !session) {
+                // Potentially lost session
+            }
+        }, 1000 * 60 * 5) // Check every 5 mins
+
         return () => {
             subscription.unsubscribe()
+            clearInterval(interval)
         }
     }, [])
 
